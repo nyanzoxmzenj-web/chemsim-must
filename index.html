@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ChemSim MUST | Experiment 1</title>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="../firebase-config.js"></script>
+<script>
+/* Login guard: hide page until Firebase confirms the user is logged in */
+document.documentElement.style.visibility = "hidden";
+auth.onAuthStateChanged(function (user) {
+  if (!user) { window.location.replace("../index.html"); }
+  else { document.documentElement.style.visibility = "visible"; }
+});
+</script>
+
+<style>
+:root {
+  --navy:#10243a;
+  --blue:#176b87;
+  --teal:#22a699;
+  --paper:#f4f7fb;
+  --card:#fff;
+  --ink:#1b2733;
+  --muted:#627184;
+  --line:#dce5ed;
+  --green:#16794b;
+}
+* { box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body {
+  margin:0;
+  font-family:Arial,system-ui,sans-serif;
+  background:var(--paper);
+  color:var(--ink);
+}
+header {
+  background:linear-gradient(120deg,var(--navy),#174b68);
+  color:white;
+  padding:24px clamp(16px,4vw,54px);
+}
+.topline {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  flex-wrap:wrap;
+}
+.brand { font-weight:800;font-size:1.1rem; }
+.tag {
+  border:1px solid #ffffff45;
+  border-radius:30px;
+  padding:6px 10px;
+  font-size:.78rem;
+}
+.user-box { display:flex;align-items:center;gap:10px;flex-wrap:wrap; }
+.user-name { font-size:.88rem;color:#d7e8f2; }
+.logout {
+  background:#ffffff1c;border:1px solid #ffffff4a;color:white;
+  border-radius:30px;padding:7px 14px;font-size:.8rem;
+}
+.logout:hover { background:#ffffff33;filter:none; }
+header h1 {
+  margin:25px 0 10px;
+  font-size:clamp(1.8rem,4vw,2.6rem);
+}
+header p { max-width:800px;line-height:1.7;color:#d7e8f2; }
+nav { display:flex;gap:8px;flex-wrap:wrap;margin-top:20px; }
+nav a {
+  color:white;text-decoration:none;
+  border:1px solid #ffffff4a;
+  border-radius:8px;padding:9px 12px;
+}
+nav a:hover { background:#ffffff20; }
+main { max-width:1200px;margin:25px auto;padding:0 16px 40px; }
+.notice {
+  background:#fff7e5;border:1px solid #f2d18a;
+  border-radius:12px;padding:14px;margin-bottom:18px;
+  color:#654c14;line-height:1.6;
+}
+.grid {
+  display:grid;grid-template-columns:repeat(12,minmax(0,1fr));
+  gap:16px;
+}
+.card {
+  background:var(--card);border:1px solid var(--line);
+  border-radius:15px;padding:20px;
+  box-shadow:0 4px 14px #17334d08;
+  min-width:0;
+}
+.span-4 { grid-column:span 4; }
+.span-6 { grid-column:span 6; }
+.span-8 { grid-column:span 8; }
+.span-12 { grid-column:span 12; }
+h2 { margin:0 0 14px;color:var(--navy);font-size:1.25rem; }
+h3 { margin:16px 0 8px; }
+p,li { line-height:1.65; }
+.muted { color:var(--muted); }
+.pill {
+  display:inline-block;background:#e8f4f7;color:#15536a;
+  padding:5px 9px;border-radius:99px;font-size:.8rem;margin:3px;
+}
+.steps { display:grid;gap:10px; }
+.step {
+  border:1px solid var(--line);border-radius:10px;padding:13px;
+  display:grid;grid-template-columns:34px 1fr;gap:10px;
+}
+.num {
+  width:30px;height:30px;border-radius:50%;
+  display:grid;place-items:center;background:#e4f3f5;
+  color:#15536a;font-weight:bold;
+}
+button {
+  border:0;border-radius:9px;padding:11px 14px;
+  font-weight:bold;cursor:pointer;background:var(--blue);color:white;
+}
+button:hover { filter:brightness(.92); }
+button.secondary { background:#eaf0f5;color:var(--navy);border:1px solid var(--line); }
+.actions { display:flex;flex-wrap:wrap;gap:8px;margin-top:12px; }
+.lab { background:#10243a;color:#eaf5fa;border-radius:13px;padding:16px; }
+.lab h2 { color:white; }
+.lab p { color:#b9ceda; }
+.bench {
+  display:flex;justify-content:center;align-items:end;gap:22px;
+  min-height:205px;padding:18px 5px 10px;
+  border-bottom:2px solid #6f8a9b;
+}
+.jar {
+  width:82px;height:125px;border:3px solid #bdd3df;border-top:0;
+  border-radius:0 0 16px 16px;position:relative;overflow:hidden;
+  background:#ffffff12;
+}
+.jar:before {
+  content:"";position:absolute;top:0;left:-3px;width:82px;
+  border-top:3px solid #bdd3df;
+}
+.liquid {
+  position:absolute;bottom:0;left:0;right:0;height:35%;
+  background:#b67a35;transition:height .5s,background .5s;
+}
+.jar-label { text-align:center;font-size:.78rem;color:#c6d9e4;margin-top:8px; }
+.dropper {
+  width:17px;height:70px;border:2px solid #b7d7e4;
+  border-radius:7px;transform:rotate(20deg);
+  background:linear-gradient(#6d9eb4 0 25%,#d6edf5 25%);
+  margin-bottom:28px;
+}
+.result {
+  margin-top:12px;padding:12px;border-radius:9px;
+  background:#18384b;color:#d8eaf3;line-height:1.6;
+}
+.test-grid { display:grid;grid-template-columns:1fr 1fr;gap:12px; }
+.test-box { border:1px solid #34576b;border-radius:10px;padding:12px; }
+.test-color { height:16px;border-radius:5px;background:#b67a35;margin:10px 0; }
+label { display:block;margin:12px 0 5px;font-weight:650; }
+select,input[type=number] {
+  width:100%;padding:10px;border:1px solid var(--line);
+  border-radius:8px;background:white;
+}
+.metric { display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px; }
+.metric>div { background:#f0f6f8;border-radius:10px;padding:12px; }
+.metric b { display:block;font-size:1.3rem;color:var(--navy);margin-top:5px; }
+.quiz-q { border-top:1px solid var(--line);padding:13px 0; }
+.quiz-q label { display:flex;gap:8px;align-items:flex-start;font-weight:normal;margin:9px 0; }
+.quiz-q input { margin-top:5px; }
+.feedback { margin-top:12px;font-weight:bold;line-height:1.6; }
+footer { text-align:center;color:var(--muted);padding:25px;font-size:.9rem; }
+@media(max-width:800px) {
+  .span-4,.span-6,.span-8 { grid-column:span 12; }
+  .test-grid { grid-template-columns:1fr; }
+  .bench { gap:12px; }
+}
+</style>
+</head>
+
+<body>
+<header>
+  <div class="topline">
+    <div class="brand">⚗ ChemSim MUST</div>
+    <div class="user-box">
+      <span class="user-name" id="userName"></span>
+      <span class="tag">VIRTUAL CHEMISTRY LABORATORY</span>
+      <button class="logout" onclick="logout()">Log out</button>
+    </div>
+  </div>
+
+  <h1>Experiment 1: Extraction of Cinnamaldehyde</h1>
+  <p>
+    Explore the isolation of cinnamaldehyde from cinnamon bark and
+    investigate its aldehyde group and carbon-carbon unsaturation
+    using simulated qualitative tests.
+  </p>
+
+  <nav>
+    <a href="../home.html">← Home</a>
+    <a href="#overview">Overview</a>
+    <a href="#procedure">Procedure</a>
+    <a href="#simulation">Virtual Lab</a>
+    <a href="#results">Results</a>
+    <a href="#quiz">Quiz</a>
+  </nav>
+</header>
+
+<main>
+<div class="notice">
+  <strong>Learning simulation:</strong>
+  This page models expected teaching-lab observations and is not a
+  validated experimental protocol. Follow your institution's approved
+  laboratory manual and instructor directions.
+</div>
+
+<section class="grid" id="overview">
+  <article class="card span-8">
+    <h2>1. Aim and Theory</h2>
+    <p><strong>Aim:</strong> To extract cinnamaldehyde-containing oil
+    from cinnamon bark and investigate functional groups in the extract.</p>
+
+    <p>Cinnamaldehyde is an aromatic aldehyde associated with cinnamon's
+    characteristic smell. It contains an aldehyde group (–CHO) and a
+    carbon-carbon double bond (C=C). Extraction separates components
+    from plant material, but the extract may contain other compounds.</p>
+
+    <h3>Learning outcomes</h3>
+    <ul>
+      <li>Explain why cinnamon is processed before extraction.</li>
+      <li>Identify evidence for an aldehyde group.</li>
+      <li>Interpret evidence for carbon-carbon unsaturation.</li>
+      <li>Recognise the limitations of qualitative tests.</li>
+    </ul>
+
+    <h3>Key terms</h3>
+    <span class="pill">Cinnamaldehyde</span>
+    <span class="pill">Extraction</span>
+    <span class="pill">Aldehyde</span>
+    <span class="pill">Unsaturation</span>
+    <span class="pill">Qualitative analysis</span>
+  </article>
+
+  <aside class="card span-4">
+    <h2>2. Apparatus and Materials</h2>
+    <ul>
+      <li>Cinnamon bark or powdered cinnamon</li>
+      <li>Approved extraction apparatus</li>
+      <li>Collection vessel and filter</li>
+      <li>Labelled test tubes and droppers</li>
+      <li>Brady's reagent and dilute Baeyer's reagent</li>
+      <li>Safety glasses, lab coat and suitable gloves</li>
+    </ul>
+    <p class="muted">Use only the quantities, concentrations and
+    methods specified in your approved laboratory manual.</p>
+  </aside>
+
+  <article class="card span-12" id="procedure">
+    <h2>3. Guided Procedure</h2>
+    <p class="muted">Conceptual stages for learning. Follow your
+    instructor's approved method in an actual laboratory.</p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="num">1</div>
+        <div><strong>Prepare the sample</strong><br>
+        Observe the cinnamon bark and prepare it as directed.
+        Increasing surface area can help extraction.</div>
+      </div>
+      <div class="step">
+        <div class="num">2</div>
+        <div><strong>Extract aromatic components</strong><br>
+        Use the approved extraction or steam-distillation setup
+        under instructor supervision.</div>
+      </div>
+      <div class="step">
+        <div class="num">3</div>
+        <div><strong>Collect the extract</strong><br>
+        Label the collected material and record its appearance.
+        Do not directly inhale vapours.</div>
+      </div>
+      <div class="step">
+        <div class="num">4</div>
+        <div><strong>Brady's test</strong><br>
+        A yellow/orange precipitate with 2,4-DNPH can indicate a
+        carbonyl compound. It does not uniquely identify cinnamaldehyde.</div>
+      </div>
+      <div class="step">
+        <div class="num">5</div>
+        <div><strong>Baeyer's test</strong><br>
+        Purple permanganate may fade and brown manganese dioxide
+        may form when oxidisable unsaturation is present.</div>
+      </div>
+      <div class="step">
+        <div class="num">6</div>
+        <div><strong>Record observations</strong><br>
+        Compare results with controls and interpret the limitations
+        of each test.</div>
+      </div>
+    </div>
+  </article>
+</section>
+
+<section class="grid" id="simulation" style="margin-top:16px">
+  <article class="card span-8">
+    <h2>4. Virtual Lab Bench</h2>
+    <p class="muted">Choose a stage to view a representative
+    simulated observation.</p>
+
+    <div class="lab">
+      <h2>Sample and Test Station</h2>
+      <p>Virtual observations only — not measured experimental data.</p>
+
+      <div class="bench">
+        <div>
+          <div class="jar"><div class="liquid" id="extractLiquid"></div></div>
+          <div class="jar-label">Cinnamon extract</div>
+        </div>
+        <div class="dropper"></div>
+        <div>
+          <div class="jar"><div class="liquid" id="testLiquid"></div></div>
+          <div class="jar-label" id="testJarLabel">Test sample</div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button onclick="showStage('extract')">View Extraction</button>
+        <button onclick="showStage('brady')">Run Brady's Test</button>
+        <button onclick="showStage('baeyer')">Run Baeyer's Test</button>
+        <button class="secondary" onclick="resetLab()">Reset</button>
+      </div>
+
+      <div class="result" id="labResult" aria-live="polite">
+        Select a stage to begin.
+      </div>
+    </div>
+  </article>
+
+  <article class="card span-4">
+    <h2>5. Test Indicators</h2>
+
+    <div class="test-grid">
+      <div class="test-box">
+        <strong>Brady's test</strong>
+        <span class="muted">Carbonyl evidence</span>
+        <div class="test-color" id="bradySwatch"></div>
+        <p id="bradyReadout" class="muted">Not yet run</p>
+      </div>
+
+      <div class="test-box">
+        <strong>Baeyer's test</strong>
+        <span class="muted">Unsaturation evidence</span>
+        <div class="test-color" id="baeyerSwatch"
+          style="background:#7d3fb2"></div>
+        <p id="baeyerReadout" class="muted">Not yet run</p>
+      </div>
+    </div>
+
+    <p class="muted">A positive qualitative test alone cannot establish
+    the identity or purity of a sample.</p>
+  </article>
+
+  <article class="card span-6" id="results">
+    <h2>6. Results Record</h2>
+
+    <label for="appearance">Extract appearance</label>
+    <select id="appearance">
+      <option value="">Choose observation...</option>
+      <option>Pale yellow / yellow-brown liquid</option>
+      <option>Colourless liquid</option>
+      <option>Dark brown mixture</option>
+      <option>No visible extract</option>
+    </select>
+
+    <label for="bradyObs">Brady's test observation</label>
+    <select id="bradyObs">
+      <option value="">Choose observation...</option>
+      <option>Yellow/orange precipitate</option>
+      <option>No visible precipitate</option>
+      <option>Unclear / unexpected result</option>
+    </select>
+
+    <label for="baeyerObs">Baeyer's test observation</label>
+    <select id="baeyerObs">
+      <option value="">Choose observation...</option>
+      <option>Purple colour fades; brown precipitate may form</option>
+      <option>Purple colour remains</option>
+      <option>Unclear / unexpected result</option>
+    </select>
+
+    <div class="actions">
+      <button onclick="saveResults()">Interpret Record</button>
+      <button class="secondary" onclick="clearResults()">Clear</button>
+    </div>
+
+    <div id="recordFeedback" class="result"
+      style="background:#edf5f7;color:#17374a">
+      Choose observations and interpret them.
+    </div>
+  </article>
+
+  <article class="card span-6">
+    <h2>7. Sample Calculations</h2>
+    <p>Enter your actual measured masses if your practical requires
+    this calculation.</p>
+
+    <label for="startMass">Starting cinnamon mass (g)</label>
+    <input id="startMass" type="number" min="0" step="0.01"
+      placeholder="e.g. 10.00">
+
+    <label for="extractMass">Collected extract mass (g)</label>
+    <input id="extractMass" type="number" min="0" step="0.01"
+      placeholder="e.g. 0.25">
+
+    <div class="actions">
+      <button onclick="calculateYield()">Calculate Ratio</button>
+    </div>
+
+    <div class="metric">
+      <div>
+        <span class="muted">Apparent mass ratio</span>
+        <b id="yieldValue">—</b>
+      </div>
+      <div>
+        <span class="muted">Status</span>
+        <b id="yieldStatus" style="font-size:1rem">Awaiting data</b>
+      </div>
+    </div>
+
+    <p class="muted">Ratio = extract mass ÷ starting cinnamon mass × 100.
+    This is not the true cinnamaldehyde yield because the extract
+    may contain other compounds or water.</p>
+  </article>
+</section>
+
+<section class="grid" id="quiz" style="margin-top:16px">
+  <article class="card span-12">
+    <h2>8. Knowledge Check</h2>
+
+    <div class="quiz-q">
+      <strong>Q1. What is the main purpose of extraction?</strong>
+      <label><input type="radio" name="q1" value="a">
+        To change every compound into cinnamaldehyde</label>
+      <label><input type="radio" name="q1" value="b">
+        To separate target components from plant material</label>
+      <label><input type="radio" name="q1" value="c">
+        To prove the extract is completely pure</label>
+    </div>
+
+    <div class="quiz-q">
+      <strong>Q2. A yellow/orange precipitate with Brady's reagent
+      most directly indicates:</strong>
+      <label><input type="radio" name="q2" value="a">
+        A possible carbonyl compound</label>
+      <label><input type="radio" name="q2" value="b">
+        Chloride ions only</label>
+      <label><input type="radio" name="q2" value="c">
+        The exact identity and purity of cinnamaldehyde</label>
+    </div>
+
+    <div class="quiz-q">
+      <strong>Q3. Baeyer's reagent is commonly used to test for:</strong>
+      <label><input type="radio" name="q3" value="a">
+        Unsaturation such as a C=C bond</label>
+      <label><input type="radio" name="q3" value="b">
+        Sodium ions</label>
+      <label><input type="radio" name="q3" value="c">
+        The mass of the extract</label>
+    </div>
+
+    <div class="quiz-q">
+      <strong>Q4. Why is a positive qualitative test not enough
+      to prove purity?</strong>
+      <label><input type="radio" name="q4" value="a">
+        Qualitative tests never produce observations</label>
+      <label><input type="radio" name="q4" value="b">
+        Other compounds may give similar reactions</label>
+      <label><input type="radio" name="q4" value="c">
+        Cinnamon contains no organic compounds</label>
+    </div>
+
+    <div class="actions">
+      <button onclick="markQuiz()">Check Answers</button>
+      <button class="secondary" onclick="resetQuiz()">Try Again</button>
+    </div>
+    <div id="quizFeedback" class="feedback" aria-live="polite"></div>
+  </article>
+
+  <article class="card span-12">
+    <h2>9. Safety and Waste</h2>
+    <ul>
+      <li>Wear appropriate eye protection, lab coat and gloves.</li>
+      <li>Use Brady's reagent only under instructor supervision and
+      dispose of it as hazardous waste.</li>
+      <li>Potassium permanganate is an oxidiser. Avoid contact and
+      follow the approved disposal procedure.</li>
+      <li>Do not taste samples or directly inhale vapours.</li>
+      <li>Use heating equipment and solvents only as authorised.</li>
+    </ul>
+  </article>
+</section>
+</main>
+
+<footer>
+  ChemSim MUST · Experiment 1 · Educational simulation
+</footer>
+
+<script>
+/* ===== Session: show user name and log out ===== */
+auth.onAuthStateChanged(function (user) {
+  if (!user) return;
+  var name = user.displayName || user.email;
+  document.getElementById("userName").textContent = "\uD83D\uDC64 " + name;
+});
+
+function logout() {
+  auth.signOut().then(function () { window.location.href = "../index.html"; });
+}
+
+/* ===== Virtual lab ===== */
+function showStage(stage) {
+  const extract = document.getElementById("extractLiquid");
+  const test = document.getElementById("testLiquid");
+  const result = document.getElementById("labResult");
+  const label = document.getElementById("testJarLabel");
+
+  if (stage === "extract") {
+    extract.style.height = "48%";
+    extract.style.background = "#b98a43";
+    test.style.height = "25%";
+    test.style.background = "#b98a43";
+    label.textContent = "Collected extract";
+
+    result.textContent =
+      "Simulated observation: a yellow to yellow-brown extract may be obtained. Appearance alone does not confirm cinnamaldehyde.";
+  }
+
+  if (stage === "brady") {
+    test.style.height = "58%";
+    test.style.background = "#e6a22c";
+    label.textContent = "Brady's test";
+
+    document.getElementById("bradySwatch").style.background = "#e6a22c";
+    document.getElementById("bradyReadout").textContent =
+      "Simulated: yellow/orange precipitate";
+
+    result.textContent =
+      "A yellow/orange precipitate may indicate a carbonyl compound. This test does not uniquely identify cinnamaldehyde.";
+  }
+
+  if (stage === "baeyer") {
+    test.style.height = "58%";
+    test.style.background = "#8c5ab5";
+    label.textContent = "Baeyer's test";
+
+    document.getElementById("baeyerSwatch").style.background = "#8a633d";
+    document.getElementById("baeyerReadout").textContent =
+      "Simulated: purple fades; brown MnO2 may appear";
+
+    result.textContent =
+      "Purple permanganate may fade and brown MnO2 may form when oxidisable unsaturation is present. Other substances can also react.";
+  }
+}
+
+function resetLab() {
+  document.getElementById("extractLiquid").style.height = "35%";
+  document.getElementById("extractLiquid").style.background = "#b67a35";
+  document.getElementById("testLiquid").style.height = "35%";
+  document.getElementById("testLiquid").style.background = "#b67a35";
+  document.getElementById("testJarLabel").textContent = "Test sample";
+  document.getElementById("labResult").textContent = "Select a stage to begin.";
+  document.getElementById("bradySwatch").style.background = "#b67a35";
+  document.getElementById("baeyerSwatch").style.background = "#7d3fb2";
+  document.getElementById("bradyReadout").textContent = "Not yet run";
+  document.getElementById("baeyerReadout").textContent = "Not yet run";
+}
+
+function saveResults() {
+  const a = document.getElementById("appearance").value;
+  const b = document.getElementById("bradyObs").value;
+  const c = document.getElementById("baeyerObs").value;
+  const out = document.getElementById("recordFeedback");
+
+  if (!a || !b || !c) {
+    out.textContent = "Please select all three observations before interpreting the record.";
+    return;
+  }
+
+  let text = "Record saved for this session. ";
+
+  text += b === "Yellow/orange precipitate"
+    ? "Brady's result is consistent with a carbonyl compound. "
+    : b === "No visible precipitate"
+    ? "The expected positive Brady's pattern was not observed. "
+    : "Brady's result is inconclusive. ";
+
+  text += c === "Purple colour fades; brown precipitate may form"
+    ? "Baeyer's result is consistent with oxidisable unsaturation. "
+    : c === "Purple colour remains"
+    ? "The expected positive Baeyer's pattern was not observed. "
+    : "Baeyer's result is inconclusive. ";
+
+  text += "Compare with controls. These tests alone cannot establish purity.";
+  out.textContent = text;
+}
+
+function clearResults() {
+  ["appearance", "bradyObs", "baeyerObs"].forEach(id => {
+    document.getElementById(id).selectedIndex = 0;
+  });
+
+  document.getElementById("recordFeedback").textContent =
+    "Choose observations and interpret them.";
+
+  document.getElementById("startMass").value = "";
+  document.getElementById("extractMass").value = "";
+  document.getElementById("yieldValue").textContent = "—";
+  document.getElementById("yieldStatus").textContent = "Awaiting data";
+}
+
+function calculateYield() {
+  const start = Number(document.getElementById("startMass").value);
+  const extract = Number(document.getElementById("extractMass").value);
+  const value = document.getElementById("yieldValue");
+  const status = document.getElementById("yieldStatus");
+
+  if (!Number.isFinite(start) || !Number.isFinite(extract) ||
+      start <= 0 || extract < 0 ||
+      document.getElementById("startMass").value === "" ||
+      document.getElementById("extractMass").value === "") {
+    value.textContent = "—";
+    status.textContent = "Enter valid data";
+    return;
+  }
+
+  value.textContent = (extract / start * 100).toFixed(2) + "%";
+  status.textContent = "Apparent ratio";
+}
+
+function markQuiz() {
+  const answers = { q1:"b", q2:"a", q3:"a", q4:"b" };
+  let score = 0;
+  let answered = 0;
+
+  for (const [q, correct] of Object.entries(answers)) {
+    const selected = document.querySelector(
+      'input[name="' + q + '"]:checked'
+    );
+
+    if (selected) {
+      answered++;
+      if (selected.value === correct) score++;
+    }
+  }
+
+  const feedback = document.getElementById("quizFeedback");
+  feedback.textContent =
+    "Score: " + score + "/4 (" + answered +
+    " answered). " +
+    (score === 4
+      ? "Excellent! All answers are correct."
+      : "Review the theory and try again.");
+
+  feedback.style.color = score === 4 ? "#16794b" : "#8a4b08";
+}
+
+function resetQuiz() {
+  document.querySelectorAll('#quiz input[type="radio"]').forEach(input => {
+    input.checked = false;
+  });
+  document.getElementById("quizFeedback").textContent = "";
+}
+</script>
+</body>
+</html>

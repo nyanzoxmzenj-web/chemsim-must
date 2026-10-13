@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Experiments | ChemSim MUST Virtual Chemistry Laboratory</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Fraunces:opsz,wght@9..144,500;9..144,650&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#08141f;--ink:#14232d;--muted:#5c6d78;--teal:#0e6f6c;--teal-2:#148f8a;--gold:#c9a227;--paper:#f5f2eb;--card:#fff;--line:#e6dfd3;--organic:#b45309;--inorganic:#1d4ed8;--analytical:#0f766e;--shadow:0 20px 48px rgba(8,20,31,.12);--radius:18px}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:Outfit,system-ui,sans-serif;color:var(--ink);background:var(--paper);line-height:1.5}
+a{color:inherit;text-decoration:none}
+img{max-width:100%;display:block}
+button{font-family:inherit}
+.wrap{width:min(1160px,calc(100% - 40px));margin-inline:auto}
+header{position:absolute;inset:0 0 auto;z-index:20;display:flex;justify-content:center;padding:18px 0}
+.nav{width:min(1160px,calc(100% - 40px));display:flex;align-items:center;justify-content:space-between;gap:16px;color:#fff}
+.brand{display:flex;align-items:center;gap:12px}
+.mark{width:42px;height:42px;border-radius:12px;flex-shrink:0;display:grid;place-items:center;background:linear-gradient(145deg,#1aa39c,#0c5e5b);box-shadow:0 8px 18px rgba(14,111,108,.35)}
+.brand strong{display:block;font-size:1.05rem;letter-spacing:.02em}
+.brand span{display:block;font-size:.72rem;opacity:.78;font-weight:400}
+.nav-actions{display:flex;gap:10px;align-items:center}
+.btn{border:0;cursor:pointer;border-radius:999px;display:inline-block;padding:10px 18px;font-weight:600;font-size:.92rem;text-align:center;transition:transform .2s ease,background .2s ease,box-shadow .2s ease}
+.btn:hover{transform:translateY(-1px)}
+.btn-ghost{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.22);backdrop-filter:blur(10px)}
+.btn-ghost.is-active{background:rgba(255,255,255,.28);border-color:rgba(255,255,255,.5)}
+.btn-gold{background:var(--gold);color:#1a1404}
+.btn-teal{background:var(--teal);color:#fff}
+.btn-outline{background:transparent;color:var(--teal);border:1px solid #bddcda}
+.hero{text-align:center;background:linear-gradient(180deg,rgba(8,20,31,.55) 0%,rgba(8,20,31,.78) 58%,rgba(8,20,31,.94) 100%),url("https://images.unsplash.com/photo-1554475900-0a0350e3fc7b?auto=format&fit=crop&w=2400&q=80") center/cover no-repeat;color:#fff;padding:118px 0 84px;position:relative}
+.kicker{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:22px;justify-content:center}
+.pill{font-size:.75rem;font-weight:600;letter-spacing:.04em;padding:6px 12px;border-radius:999px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18)}
+.hero h1{font-family:Fraunces,Georgia,serif;font-size:clamp(2rem,4.4vw,3.2rem);line-height:1.08;max-width:20ch;margin:0 auto 16px}
+.hero p.lede{max-width:56ch;color:rgba(255,255,255,.82);font-size:1.08rem;margin:0 auto 28px}
+.hero-actions{display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
+section{padding:56px 0}
+.section-head{display:flex;justify-content:space-between;gap:18px;align-items:end;margin-bottom:22px;flex-wrap:wrap}
+.section-head h2{font-family:Fraunces,Georgia,serif;font-size:clamp(1.6rem,3vw,2.2rem)}
+.section-head p{color:var(--muted)}
+.filters{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:22px}
+.chip{border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:999px;padding:8px 14px;cursor:pointer;font-weight:600;font-size:.9rem}
+.chip.is-on,.chip:hover{background:var(--navy);color:#fff;border-color:var(--navy)}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.card{background:var(--card);border-radius:var(--radius);overflow:hidden;border:1px solid #efe9de;box-shadow:0 10px 28px rgba(8,20,31,.05);display:flex;flex-direction:column;min-height:100%;transition:transform .2s ease,box-shadow .2s ease}
+.card[hidden]{display:none}
+.card:hover{transform:translateY(-4px);box-shadow:var(--shadow)}
+.card-top{height:8px}
+.card[data-cat="organic"] .card-top{background:var(--organic)}
+.card[data-cat="inorganic"] .card-top{background:var(--inorganic)}
+.card[data-cat="analytical"] .card-top{background:var(--analytical)}
+.card-body{padding:20px 20px 18px;display:flex;flex-direction:column;gap:10px;flex:1}
+.meta{display:flex;justify-content:space-between;gap:8px;font-size:.75rem;font-weight:600;color:var(--muted)}
+.tag{text-transform:uppercase;letter-spacing:.04em;padding:3px 8px;border-radius:999px;background:#f3eee4}
+.card h3{font-size:1.12rem;line-height:1.25}
+.card p{color:var(--muted);font-size:.92rem;flex:1}
+.card-actions{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:6px}
+.mins{font-size:.8rem;color:var(--muted);font-weight:500}
+footer{background:var(--navy);color:#d7e0e6;padding:48px 0 24px;margin-top:20px}
+.foot-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:28px;margin-bottom:28px}
+footer h3{color:#fff;margin-bottom:10px;font-size:1.05rem}
+footer p,footer li{font-size:.92rem;color:#b7c4cc}
+footer ul{list-style:none;display:grid;gap:6px}
+.copy{border-top:1px solid rgba(255,255,255,.08);padding-top:16px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:.8rem;color:#8ea0aa}
+.modal{position:fixed;inset:0;z-index:50;display:none;place-items:center;padding:20px;background:rgba(8,20,31,.62)}
+.modal.is-open{display:grid}
+.sheet{width:min(560px,100%);background:#fff;border-radius:22px;padding:24px;box-shadow:var(--shadow);max-height:86vh;display:flex;flex-direction:column}
+.sheet h2{font-family:Fraunces,Georgia,serif;margin-bottom:8px}
+.sheet>p{color:var(--muted);margin-bottom:14px}
+.rules{display:grid;gap:10px;overflow:auto}
+.rule{display:grid;grid-template-columns:42px 1fr;gap:12px;align-items:start;padding:12px;border-radius:14px;background:var(--paper)}
+.rule b{display:block;margin-bottom:2px}
+.rule span{color:var(--muted);font-size:.9rem}
+.ico{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;background:#e8f4f3;color:var(--teal);font-weight:700}
+.sheet-actions{display:flex;justify-content:flex-end;margin-top:18px}
+@media(max-width:900px){.grid,.foot-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:640px){
+.grid,.foot-grid{grid-template-columns:1fr}
+.hero{padding:108px 0 78px}
+.nav{gap:10px}.brand span{display:none}.brand strong{font-size:.95rem}
+.nav-actions{gap:6px}.nav-actions .btn{padding:8px 12px;font-size:.82rem}}
+@media(max-width:380px){.brand strong{display:none}}
+</style>
+</head>
+<body>
+<header>
+  <nav class="nav" aria-label="Main navigation">
+    <a class="brand" href="index.html" aria-label="ChemSim MUST home">
+      <div class="mark">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M9 3h6M10 3v5.2L5.4 19.1A2.2 2.2 0 0 0 7.4 22h9.2a2.2 2.2 0 0 0 2-2.9L14 8.2V3" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/>
+          <path d="M8.2 15.5h7.6" stroke="#F5D56A" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div><strong>ChemSim MUST</strong><span>Virtual Chemistry Laboratory</span></div>
+    </a>
+    <div class="nav-actions">
+      <a class="btn btn-ghost" href="index.html">Home</a>
+      <a class="btn btn-ghost is-active" href="experiments.html" aria-current="page">Experiments</a>
+      <button class="btn btn-gold" type="button" data-open-safety>Lab Safety</button>
+    </div>
+  </nav>
+</header>
+
+<section class="hero" id="top">
+  <div class="wrap">
+    <div class="kicker">
+      <span class="pill">Department of Applied Sciences — COSTE</span>
+      <span class="pill">NSLT 07406 · Chemistry Practical II</span>
+    </div>
+    <h1>Experiments</h1>
+    <p class="lede">Choose a practical, review the procedure and start the simulation at your virtual MUST bench.</p>
+    <div class="hero-actions"><a class="btn btn-ghost" href="index.html">&larr; Back to Home</a></div>
+  </div>
+</section>
+
+<section id="experiments">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <h2>Experiment catalogue</h2>
+        <p id="countLabel">Showing 18 virtual practicals</p>
+      </div>
+    </div>
+    <div class="filters" role="group" aria-label="Filter experiments">
+      <button class="chip is-on" data-filter="all" type="button">All Experiments</button>
+      <button class="chip" data-filter="organic" type="button">Organic Chemistry</button>
+      <button class="chip" data-filter="inorganic" type="button">Inorganic &amp; Complexes</button>
+      <button class="chip" data-filter="analytical" type="button">Analytical &amp; Titration</button>
+    </div>
+
+    <div class="grid" id="grid">
+      <article class="card" data-cat="organic" data-keys="cinnamaldehyde extraction cinnamon steam distillation aldehyde organic">
+        <div class="card-top"></div>
+        <div class="card-body">
+          <div class="meta"><span class="tag">Organic</span><span>EXP 01</span></div>
+          <h3>Cinnamaldehyde Extraction</h3>
+          <p>Isolate the aromatic aldehyde from cinnamon bark by steam distillation and confirm with Tollens’ and Brady’s tests.</p>
+          <div class="card-actions"><span class="mins">90 min · Intermediate</span><a class="btn btn-teal" href="experiments/cinnamaldehyde.html">Start Simulation</a></div>
+        </div>
+      </article>
+      <article class="card" data-cat="organic" data-keys="aspirin preparation acetylsalicylic acid esterification salicylic organic">
+        <div class="card-top"></div>
+        <div class="card-body">
+          <div class="meta"><span class="tag">Organic</span><span>EXP 02</span></div>
+          <h3>Aspirin Preparation</h3>
+          <p>Acetylate salicylic acid, recrystallise the product and estimate purity by melting point and titration.</p>
+          <div class="card-actions"><span class="mins">80 min · Intermediate</span><a class="btn btn-teal" href="experiments/aspirin.html">Start Simulation</a></div>
+        </div>
+      </article>
+      <article class="card" data-cat="organic" data-keys="paper chromatography pigments rf values organic separation">
+        <div class="card-top"></div>
+        <div class="card-body">
+          <div class="meta"><span class="tag">Organic</span><span>EXP 03</span></div>
+          <h3>Paper Chromatography</h3>
+          <p>Resolve plant pigments, calculate Rf values and identify components against authentic standards.</p>
+          <div class="card-actions"><span class="mins">50 min · Foundation</span><a class="btn btn-teal" href="experiments/chromatography.html">Start Simulation</a></div>
+        </div>
+      </article>
+      <article class="card" data-cat="organic" data-keys="steam distillation clove eugenol essential oil organic">
+        <div class="card-top"></div>
+        <div class="card-body">
+          <div class="meta"><span class="tag">Organic</span><span>EXP 04</span></div>
+          <h3>Steam Distillation of Clove Oil</h3>
+          <p>Recover eugenol from cloves, dry the oil and evaluate yield against theoretical mass.</p>
+          <div class="card-actions"><span class="mins">75 min · Intermediate</span><a class="btn btn-teal" href="experiments/clove-oil.html">Start Simulation</a></div>
+        </div>
+      </article>
+      <article class="card" data-cat="organic" data-keys="recrystallization benzoic acid purification organic">
+        <div class="card-top"></div>
+        <div class="card-body">
+          <div class="meta"><span class="tag">Organic</span><span>EXP 05</span></div>
+          <h3>Recrystallisation of Benzoic Acid</h3>
+          <p>Purify crude benzoic acid from hot water, collect crystals and judge purity from melting range.</p>
+          <div class="card-actions"><span class="mins">60 min · Foundation</span><a class="btn btn-teal" href="experiments/recrystallisation.html">Start Simulation</a></div>
+        </div>
+      </article>
+      <article class="card" data-cat="organic" data-keys="saponification soap fats alkali organic">
+        <div class="card-top"></div>
+        <div class="card-body">
+          <div class="meta"><span class="tag">Organic</span><span>EXP 06</span></div>
+          <h3>Saponification of Fats</h3>
+          <p>Convert vegetable oil to soap with NaOH, salt out the product and test lather in hard water.</p>
+          <div class="card-actions"><span class="mins">70 min · Foundation</span><a class="btn btn-teal" href="experiments/saponification.html">Start Simulation</a></div>
+        </div>
+      </article>
+      <article class="card" data-cat="inorganic" data-keys="tetraamminecopper copper complex ammonia ligand inorganic">
+        <div class="card-top"></div>
+        <div class="card-body">
+          <div class="meta"><span class="tag">Inorganic</span><span>EXP 07</span></div>
+          <h3>Tetraamminecopper(II) Sulphate</h3>
+          <p>Prepare [Cu(NH3)4]SO4·H2O, observe the deep-blue complex and confirm coordination by colour change.</p>
+          <div class="card-actions"><span class="mins">65 min · Intermediate</span><a class="btn btn-teal" href="experiments/tetraamminecopper.html">Start Simulation</a></div>
+        </div>
+      </article>
+      <article class="card" data-cat="inorganic" data-keys="potassium trioxalatoferrate oxalate iron complex inorganic">
+        <div class="card-top"></div>
+        <div class="card-body">
+          <div class="meta"><span class="tag">Inorganic</span><span>EXP 08</span></div>
+          <h3>Potassium Trioxalatoferrate(III)</h3>
+          <p>Synthesise K3[Fe(C2O4)3]·3H2O crystals and examine ligand denticity in an octahedral complex.</p>
+          <div class="card-actions"><span class="mins">90 min · Advanced</span><a class="btn btn-teal" href="experiments/trioxalatoferrate.html">Start Simulation</a></div>
+        </div>
+      </article>
+      <article class="card" data-cat="inorganic" data-keys="qualitative analysis cations groups inorganic">
+        <div class="card-top"></div>
+        <div class="card-body">
+          <div class="meta"><span class="tag">Inorganic</span><span>EXP 09</span></div>
+          <h3>Qualitative Cation Analysis</h3>
+          <p>Separate Groups I–IV cations through controlled precipitation and confirmatory spot tests.</p>
+          <div class="card-actions"><span class="mins">100 min · Advanced</span><a class="btn btn-teal" href="experiments/cation-analysis.html">Start Simulation</a></div>
+        </div>
+      </article>
+      <article class="card" data-cat="inorganic" data-keys="mohr salt ferrous ammonium sulphate double salt inorganic">
+        <div class="card-top"></div>
+        <div class="card-body">
+          <div class="meta"><span class="tag">Inorganic</span><span>EXP 10</span></div>
+          <h3>Preparation of Mohr’s Salt</h3>
+          <p>Crystallise ferrous ammonium sulphate and use it as a primary standard for later redox work.</p>
+          <div class="card-actions"><span class="mins">70 min · Intermediate</span><a class="btn btn-teal" href="experiments/mohrs-salt.html">Start Simulation</a></div>
+        </div>
+      </article>
+      <article class="card" data-cat="inorganic" data-keys="ligand substitution chromium cobalt complexes inorganic">
+        <div class="card-top"></div>
+        <div class="card-body">
+          <div class="meta"><span class="tag">Inorganic</span><span>EXP 11</span></div>
+          <h3>Ligand Substitution Kinetics</h3>
+          <p>Track colour evolution as aqua ligands are replaced and relate observations to the spectrochemical series.</p>
+          <div class="card-actions"><span class="mins">55 min · Intermediate</span><a class="btn btn-teal" href="experiments/ligand-substitution.html">Start Simulation</a></div>
+        </div>
+      </article>
+      <article class="card" data-cat="inorganic" data-keys="gravimetric nickel dmg dimethylglyoxime inorganic">
+        <div class="card-top"></div>
+        <div class="card-body">
+          <div class="meta"><span class="tag">Inorganic</span><span>EXP 12</span></div>
+          <h3>Gravimetric Nickel as DMG</h3>
+          <p>Precipitate nickel dimethylglyoximate, dry to constant mass and calculate percentage nickel.</p>
+          <div class="card-actions"><span class="mins">85 min · Advanced</span><a class="btn btn-teal" href="experiments/nickel-dmg.html">Start Simulation</a></div>
+        </div>
+      </article>
+      <article class="card" data-cat="analytical" data-keys="colorimeter copper beer lambert spectrophotometry analytical">
+        <div class="card-top"></div>
+        <div class="card-body">
+          <div class="meta"><span class="tag">Analytical</span><span>EXP 13</span></div>
+          <h3>Colorimeter: Copper Assay</h3>
+          <p>Build a calibration curve for Cu2+ and apply Beer–Lambert to an unknown laboratory sample.</p>
+          <div class="card-actions"><span class="mins">60 min · Intermediate</span><a class="btn btn-teal" href="experiments/colorimeter.html">Start Simulation</a></div>
+        </div>
+      </article>
+      <article class="card" data-cat="analytical" data-keys="iron determination phenanthroline spectrophotometry analytical">
+        <div class="card-top"></div>
+        <div class="card-body">
+          <div class="meta"><span class="tag">Analytical</span><span>EXP 14</span></div>
+          <h3>Iron Determination</h3>
+          <p>Reduce Fe3+ to Fe2+, complex with 1,10-phenanthroline and quantify iron spectrophotometrically.</p>
+          <div class="card-actions"><span class="mins">70 min · Intermediate</span><a class="btn btn-teal" href="experiments/iron.html">Start Simulation</a></div>
+        </div>
+      </article>
+      <article class="card" data-cat="analytical" data-keys="acid base titration hcl sodium carbonate analytical">
+        <div class="card-top"></div>
+        <div class="card-body">
+          <div class="meta"><span class="tag">Analytical</span><span>EXP 15</span></div>
+          <h3>Standardisation of HCl</h3>
+          <p>Titrate hydrochloric acid against anhydrous Na2CO3 to a methyl orange end-point and compute molarity.</p>
+          <div class="card-actions"><span class="mins">45 min · Foundation</span><a class="btn btn-teal" href="experiments/hcl-standard.html">Start Simulation</a></div>
+        </div>
+      </article>
+      <article class="card" data-cat="analytical" data-keys="redox titration permanganate iron kmno4 analytical">
+        <div class="card-top"></div>
+        <div class="card-body">
+          <div class="meta"><span class="tag">Analytical</span><span>EXP 16</span></div>
+          <h3>Redox Titration with KMnO4</h3>
+          <p>Standardise permanganate against Mohr’s salt and determine iron in an unknown ferrous sample.</p>
+          <div class="card-actions"><span class="mins">55 min · Intermediate</span><a class="btn btn-teal" href="experiments/permanganate.html">Start Simulation</a></div>
+        </div>
+      </article>
+      <article class="card" data-cat="analytical" data-keys="edta complexometric calcium magnesium hardness titration analytical">
+        <div class="card-top"></div>
+        <div class="card-body">
+          <div class="meta"><span class="tag">Analytical</span><span>EXP 17</span></div>
+          <h3>EDTA Water Hardness</h3>
+          <p>Complexometrically titrate Ca2+ and Mg2+ with EDTA at pH 10 using Eriochrome Black T.</p>
+          <div class="card-actions"><span class="mins">50 min · Intermediate</span><a class="btn btn-teal" href="experiments/edta.html">Start Simulation</a></div>
+        </div>
+      </article>
+      <article class="card" data-cat="analytical" data-keys="conductometric titration conductivity acid base analytical">
+        <div class="card-top"></div>
+        <div class="card-body">
+          <div class="meta"><span class="tag">Analytical</span><span>EXP 18</span></div>
+          <h3>Conductometric Titration</h3>
+          <p>Plot conductivity against volume for a strong acid–strong base pair and locate the equivalence point.</p>
+          <div class="card-actions"><span class="mins">40 min · Foundation</span><a class="btn btn-teal" href="experiments/conductometric.html">Start Simulation</a></div>
+        </div>
+      </article>
+    </div>
+
+    <div style="text-align:center;margin-top:32px">
+      <a class="btn btn-outline" href="index.html">&larr; Return to Homepage</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <h3>Mbeya University of Science and Technology</h3>
+        <p>College of Science and Technical Education (COSTE)<br>Department of Applied Sciences<br>Virtual Chemistry Laboratory · ChemSim MUST</p>
+      </div>
+      <div>
+        <h3>Academic credentials</h3>
+        <ul>
+          <li>Programme: Ordinary Diploma in Science Laboratory Technology</li>
+          <li>Course: NSLT 07406 — Chemistry Practical II</li>
+          <li>Campus: MUST Main Campus, Mbeya, Tanzania</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Laboratory contact</h3>
+        <ul>
+          <li>Applied Sciences Practical Office</li>
+          <li>coste.applied@must.ac.tz</li>
+          <li>+255 25 250 2861</li>
+        </ul>
+      </div>
+    </div>
+    <div class="copy">
+      <span>© 2026 Mbeya University of Science and Technology. All rights reserved.</span>
+      <span>For instructional use under MUST laboratory regulations.</span>
+    </div>
+  </div>
+</footer>
+
+<div class="modal" id="safety" role="dialog" aria-modal="true" aria-labelledby="safetyTitle">
+  <div class="sheet">
+    <h2 id="safetyTitle">MUST laboratory safety rules</h2>
+    <p>Follow these COSTE Applied Sciences protocols before every virtual or physical practical.</p>
+    <div class="rules">
+      <div class="rule"><div class="ico">1</div><div><b>Lab coats at all times</b><span>Wear a fastened laboratory coat from entry to exit. Bare arms are not permitted at the MUST bench.</span></div></div>
+      <div class="rule"><div class="ico">2</div><div><b>Safety goggles required</b><span>Eye protection stays on during heating, titration, distillation and any transfer of reagents.</span></div></div>
+      <div class="rule"><div class="ico">3</div><div><b>No eating or drinking</b><span>Food, drinks and cosmetics are forbidden in the laboratory to prevent chemical ingestion.</span></div></div>
+      <div class="rule"><div class="ico">4</div><div><b>Proper pipetting only</b><span>Use a pipette filler or bulb. Mouth pipetting is strictly prohibited under MUST safety policy.</span></div></div>
+      <div class="rule"><div class="ico">5</div><div><b>Acid into water</b><span>Always add acid to water, slowly and with stirring. Never add water to concentrated acid.</span></div></div>
+    </div>
+    <div class="sheet-actions"><button class="btn btn-teal" type="button" id="closeSafety">I understand</button></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  /* Lab Safety modal */
+  var modal = document.getElementById("safety");
+  var open = function () { modal.classList.add("is-open"); };
+  var close = function () { modal.classList.remove("is-open"); };
+  document.querySelectorAll("[data-open-safety]").forEach(function (b) { b.addEventListener("click", open); });
+  document.getElementById("closeSafety").addEventListener("click", close);
+  modal.addEventListener("click", function (e) { if (e.target === modal) close(); });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape") close(); });
+
+  /* Category filter (supports links like experiments.html#organic) */
+  var cards = Array.prototype.slice.call(document.querySelectorAll("#grid .card"));
+  var chips = Array.prototype.slice.call(document.querySelectorAll(".chip"));
+  var countLabel = document.getElementById("countLabel");
+  var valid = ["all", "organic", "inorganic", "analytical"];
+
+  function apply(filter) {
+    var shown = 0;
+    cards.forEach(function (card) {
+      var on = filter === "all" || card.dataset.cat === filter;
+      card.hidden = !on;
+      if (on) shown += 1;
+    });
+    chips.forEach(function (c) { c.classList.toggle("is-on", c.dataset.filter === filter); });
+    countLabel.textContent = shown === 1 ? "Showing 1 virtual practical" : "Showing " + shown + " virtual practicals";
+  }
+
+  chips.forEach(function (chip) {
+    chip.addEventListener("click", function () {
+      apply(chip.dataset.filter);
+      if (history.replaceState) {
+        history.replaceState(null, "", chip.dataset.filter === "all" ? "experiments.html" : "#" + chip.dataset.filter);
+      }
+    });
+  });
+
+  var initial = location.hash.replace("#", "");
+  apply(valid.indexOf(initial) > -1 ? initial : "all");
+})();
+</script>
+
+
+<a href="exp1/experiments/index.html">
+  Experiment 1
+</a>
+
+
+</body>
+</html>
